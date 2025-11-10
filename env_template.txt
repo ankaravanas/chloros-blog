@@ -1,0 +1,95 @@
+# Chloros Blog MCP Server - API Configuration Template
+# Copy this file to .env and fill in your API keys
+
+# =============================================================================
+# OpenAI Configuration
+# =============================================================================
+# Get your API key from: https://platform.openai.com/api-keys
+OPENAI_API_KEY=your_openai_api_key_here
+
+# =============================================================================
+# OpenRouter Configuration  
+# =============================================================================
+# Get your API key from: https://openrouter.ai/keys
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+
+# =============================================================================
+# Perplexity Configuration
+# =============================================================================
+# Get your API key from: https://www.perplexity.ai/settings/api
+PERPLEXITY_API_KEY=your_perplexity_api_key_here
+
+# =============================================================================
+# Pinecone Configuration
+# =============================================================================
+# Get your API key from: https://app.pinecone.io/
+PINECONE_API_KEY=your_pinecone_api_key_here
+PINECONE_ENVIRONMENT=us-west1-gcp
+PINECONE_INDEX_NAME=medical
+
+# =============================================================================
+# Google OAuth2 Configuration
+# =============================================================================
+# Set up OAuth2 credentials in Google Cloud Console
+# Guide: https://developers.google.com/identity/protocols/oauth2
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+GOOGLE_REFRESH_TOKEN=your_google_refresh_token_here
+
+# =============================================================================
+# Google Sheets Configuration
+# =============================================================================
+# Your Google Sheet ID with pattern data (from the URL)
+GOOGLE_SHEETS_ID=1cRGUsLbpaSBJmA8AmpQkSzpziE4A6RlTIfwywDqKFGY
+
+# =============================================================================
+# Google Drive Configuration
+# =============================================================================
+# Folder ID where published articles will be stored
+GOOGLE_PUBLISHED_FOLDER_ID=11XQo6t3NXvOBLNmFrcTixm1Q8K6-2m8W
+
+# =============================================================================
+# Server Configuration
+# =============================================================================
+# Port for the MCP server (default: 3000)
+PORT=3000
+
+# Logging level (DEBUG, INFO, WARNING, ERROR)
+LOG_LEVEL=INFO
+
+# =============================================================================
+# Model Configuration
+# =============================================================================
+# OpenRouter model for content generation (recommended for Greek)
+OPENROUTER_MODEL=google/gemini-2.0-flash-exp
+
+# OpenAI embedding model
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+
+# Embedding dimensions (must match Pinecone index)
+EMBEDDING_DIMENSIONS=512
+
+# =============================================================================
+# Quality Configuration
+# =============================================================================
+# Minimum score to pass quality gate (0-100)
+QUALITY_PASS_THRESHOLD=80
+
+# Word count failure threshold (percentage below target)
+WORD_COUNT_FAIL_THRESHOLD=-15
+
+# Maximum retry attempts for failed generations
+MAX_RETRIES=3
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+# 1. Copy this file to .env: cp env_template.txt .env
+# 2. Replace all "your_*_here" placeholders with your actual API keys
+# 3. Set up Google Cloud project with Sheets, Docs, and Drive APIs enabled
+# 4. Create Pinecone index named "medical" with 512 dimensions
+# 5. Populate your Google Sheet with pattern data in the required tabs
+# 6. Test the configuration by running: python -m src.main
+#
+# For detailed setup instructions, see DEPLOYMENT.md
+# =============================================================================
