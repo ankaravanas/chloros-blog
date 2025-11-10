@@ -19,7 +19,7 @@ class PerplexityService:
     def __init__(self):
         """Initialize Perplexity service."""
         self.base_url = "https://api.perplexity.ai"
-        self.model = "llama-3.1-sonar-large-128k-online"
+        self.model = "sonar-pro"
         self.headers = {
             "Authorization": f"Bearer {settings.perplexity_api_key}",
             "Content-Type": "application/json"

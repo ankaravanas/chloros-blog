@@ -10,7 +10,7 @@ asyncio-throttle>=1.0.2
 
 # External API clients
 openai>=1.0.0
-pinecone-client>=3.0.0
+pinecone>=5.0.0
 google-api-python-client>=2.0.0
 google-auth-httplib2>=0.2.0
 google-auth-oauthlib>=1.0.0

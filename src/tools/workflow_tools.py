@@ -8,10 +8,7 @@ from typing import Dict, Any, Optional, List
 from fastmcp import FastMCP
 
 from ..utils.retry_handler import RetryHandler
-from .research_tools import parallel_research_phase
-from .generation_tools import generate_complete_article
-from .evaluation_tools import comprehensive_evaluation
-from .publishing_tools import create_and_publish_article
+# Import functions will be called dynamically to avoid circular imports
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +50,9 @@ async def register_workflow_tools(mcp: FastMCP):
             
             # Phase 1: Parallel Research
             logger.info("Phase 1: Starting parallel research...")
+            # Import dynamically to avoid circular imports
+            from .research_tools import parallel_research_phase
+            
             research_results = await parallel_research_phase(
                 topic=topic,
                 main_keywords=main_keywords,
@@ -98,6 +98,9 @@ async def register_workflow_tools(mcp: FastMCP):
             # Determine if should force publish
             quality_score = final_evaluation.get("total_score", 0)
             force_publish = quality_score >= force_publish_threshold
+            
+            # Import dynamically to avoid circular imports
+            from .publishing_tools import create_and_publish_article
             
             publishing_results = await create_and_publish_article(
                 article_markdown=final_article.get("article_markdown", ""),
@@ -317,6 +320,10 @@ async def _generate_and_evaluate(
     previous_evaluation: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """Generate article and evaluate it."""
+    # Import dynamically to avoid circular imports
+    from .generation_tools import generate_complete_article
+    from .evaluation_tools import comprehensive_evaluation
+    
     # Generate article
     article = await generate_complete_article(
         strategy=strategy,

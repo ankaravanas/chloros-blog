@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     log_level: str = Field(default="INFO", env="LOG_LEVEL")
     
     # Model Configuration
-    openrouter_model: str = Field(default="google/gemini-2.0-flash-exp", env="OPENROUTER_MODEL")
+    openrouter_model: str = Field(default="anthropic/claude-3-haiku", env="OPENROUTER_MODEL")
     openai_embedding_model: str = Field(default="text-embedding-3-small", env="OPENAI_EMBEDDING_MODEL")
     embedding_dimensions: int = Field(default=512, env="EMBEDDING_DIMENSIONS")
     

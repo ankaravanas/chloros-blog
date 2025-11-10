@@ -5,7 +5,7 @@ Handles vector search against medical knowledge base.
 
 import logging
 from typing import List, Dict, Any, Optional
-from pinecone import Pinecone, Index
+from pinecone import Pinecone
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from ..config import settings
@@ -19,7 +19,7 @@ class PineconeService:
     def __init__(self):
         """Initialize Pinecone client and index."""
         self.client = Pinecone(api_key=settings.pinecone_api_key)
-        self.index: Optional[Index] = None
+        self.index = None
         self._initialize_index()
     
     def _initialize_index(self):
