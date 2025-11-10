@@ -12,6 +12,8 @@ An MCP (Model Context Protocol) server that automates medical blog article creat
 
 ## Quick Start
 
+### Local Development
+
 1. **Install Dependencies**
    ```bash
    pip install -r requirements.txt
@@ -19,7 +21,7 @@ An MCP (Model Context Protocol) server that automates medical blog article creat
 
 2. **Configure Environment**
    ```bash
-   cp .env.example .env
+   cp env_template.txt .env
    # Edit .env with your API keys
    ```
 
@@ -27,6 +29,23 @@ An MCP (Model Context Protocol) server that automates medical blog article creat
    ```bash
    python -m src.main
    ```
+
+### Railway Deployment
+
+1. **Connect GitHub Repository**
+   - Create Railway project
+   - Connect to GitHub repository: `ankaravanas/chloros-blog`
+   - Enable auto-deploy on push
+
+2. **Set Environment Variables**
+   - In Railway dashboard → Variables
+   - Add all API keys (see `railway_env_setup.md`)
+   - Railway automatically handles PORT and HOST
+
+3. **Deploy**
+   - Railway auto-deploys from GitHub
+   - Monitor logs for successful startup
+   - Server accessible via Railway's provided URL
 
 ## Architecture
 

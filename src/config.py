@@ -35,7 +35,13 @@ class Settings(BaseSettings):
     
     # Server Configuration
     port: int = Field(default=3000, env="PORT")
+    host: str = Field(default="0.0.0.0", env="HOST")  # Railway requires 0.0.0.0
     log_level: str = Field(default="INFO", env="LOG_LEVEL")
+    
+    # Railway Configuration
+    railway_environment: Optional[str] = Field(default=None, env="RAILWAY_ENVIRONMENT")
+    railway_project_id: Optional[str] = Field(default=None, env="RAILWAY_PROJECT_ID")
+    railway_service_id: Optional[str] = Field(default=None, env="RAILWAY_SERVICE_ID")
     
     # Model Configuration
     openrouter_model: str = Field(default="anthropic/claude-3-haiku", env="OPENROUTER_MODEL")

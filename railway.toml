@@ -1,0 +1,31 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "python -m src.main"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[env]
+# Railway will automatically use environment variables you set in the dashboard
+# This file documents the required variables for deployment
+
+# Required API Keys (set in Railway dashboard):
+# OPENAI_API_KEY
+# OPENROUTER_API_KEY  
+# PERPLEXITY_API_KEY
+# PINECONE_API_KEY
+# PINECONE_ENVIRONMENT
+# GOOGLE_CLIENT_ID
+# GOOGLE_CLIENT_SECRET
+# GOOGLE_REFRESH_TOKEN
+# GOOGLE_SHEETS_ID
+# GOOGLE_PUBLISHED_FOLDER_ID
+
+# Railway-specific configuration
+PORT = "3000"
+LOG_LEVEL = "INFO"
+PYTHONPATH = "."
+
+[build.env]
+PYTHON_VERSION = "3.11"
