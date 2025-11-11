@@ -6,6 +6,7 @@ Handles article generation and quality evaluation using advanced models.
 import logging
 import httpx
 from typing import Dict, Any, Optional
+from typing import List  # Separate import for Railway compatibility
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from ..config import settings

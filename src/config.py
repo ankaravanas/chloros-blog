@@ -6,56 +6,43 @@ Handles environment variables and application settings.
 import os
 from typing import Optional
 from pydantic import Field
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
-    # OpenAI Configuration
-    openai_api_key: str = Field(..., env="OPENAI_API_KEY")
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=False)
     
-    # OpenRouter Configuration
-    openrouter_api_key: str = Field(..., env="OPENROUTER_API_KEY")
-    
-    # Perplexity Configuration
-    perplexity_api_key: str = Field(..., env="PERPLEXITY_API_KEY")
-    
-    # Pinecone Configuration
-    pinecone_api_key: str = Field(..., env="PINECONE_API_KEY")
-    pinecone_environment: str = Field(..., env="PINECONE_ENVIRONMENT")
-    pinecone_index_name: str = Field(default="medical", env="PINECONE_INDEX_NAME")
+    # API Keys
+    openai_api_key: str
+    openrouter_api_key: str
+    perplexity_api_key: str
+    pinecone_api_key: str
+    pinecone_environment: str
+    pinecone_index_name: str = "medical"
     
     # Google Configuration
-    google_client_id: str = Field(..., env="GOOGLE_CLIENT_ID")
-    google_client_secret: str = Field(..., env="GOOGLE_CLIENT_SECRET")
-    google_refresh_token: str = Field(..., env="GOOGLE_REFRESH_TOKEN")
-    google_sheets_id: str = Field(..., env="GOOGLE_SHEETS_ID")
-    google_published_folder_id: str = Field(..., env="GOOGLE_PUBLISHED_FOLDER_ID")
+    google_client_id: str
+    google_client_secret: str
+    google_refresh_token: str
+    google_sheets_id: str
+    google_published_folder_id: str
     
     # Server Configuration
-    port: int = Field(default=3000, env="PORT")
-    host: str = Field(default="0.0.0.0", env="HOST")  # Railway requires 0.0.0.0
-    log_level: str = Field(default="INFO", env="LOG_LEVEL")
-    
-    # Railway Configuration
-    railway_environment: Optional[str] = Field(default=None, env="RAILWAY_ENVIRONMENT")
-    railway_project_id: Optional[str] = Field(default=None, env="RAILWAY_PROJECT_ID")
-    railway_service_id: Optional[str] = Field(default=None, env="RAILWAY_SERVICE_ID")
+    port: int = 3000
+    host: str = "0.0.0.0"
+    log_level: str = "INFO"
     
     # Model Configuration
-    openrouter_model: str = Field(default="anthropic/claude-3-haiku", env="OPENROUTER_MODEL")
-    openai_embedding_model: str = Field(default="text-embedding-3-small", env="OPENAI_EMBEDDING_MODEL")
-    embedding_dimensions: int = Field(default=512, env="EMBEDDING_DIMENSIONS")
+    openrouter_model: str = "anthropic/claude-3-haiku"
+    openai_embedding_model: str = "text-embedding-3-small"
+    embedding_dimensions: int = 512
     
     # Quality Configuration
-    quality_pass_threshold: int = Field(default=80, env="QUALITY_PASS_THRESHOLD")
-    word_count_fail_threshold: float = Field(default=-0.15, env="WORD_COUNT_FAIL_THRESHOLD")  # -15%
-    max_retries: int = Field(default=3, env="MAX_RETRIES")
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
+    quality_pass_threshold: int = 80
+    word_count_fail_threshold: float = -0.15
+    max_retries: int = 3
 
 
 # Global settings instance

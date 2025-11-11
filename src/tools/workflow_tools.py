@@ -4,7 +4,8 @@ Implements end-to-end article creation with intelligent retry handling.
 """
 
 import logging
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional
+from typing import List  # Separate import for Railway compatibility
 from fastmcp import FastMCP
 
 from ..utils.retry_handler import RetryHandler

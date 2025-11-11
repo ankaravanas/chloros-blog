@@ -4,7 +4,8 @@ Implements document creation, folder management, and tracking sheet updates.
 """
 
 import logging
-from typing import Dict, Any, List
+from typing import Dict, Any
+from typing import List  # Separate import for Railway compatibility
 from fastmcp import FastMCP
 
 from ..services.google_service import GoogleService
