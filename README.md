@@ -1,100 +1,39 @@
 # Chloros Blog MCP Server
 
-An MCP (Model Context Protocol) server that automates medical blog article creation for Dr. Georgios Chloros, an orthopedic surgeon in Greece.
+MCP server that automates Greek orthopedic blog creation with RAG validation, reducing physician editing from 85% to 15%.
 
 ## Features
-
-- **RAG-Validated Content**: Triple-check system with 88-96% clinical accuracy
-- **Quality Scoring**: 0-100 scale with automated pass/fail gate at 80 points
-- **Greek Localization**: Native Greek content with cultural context integration
-- **5 Transformative Patterns**: Proven patterns that reduce physician editing from 85% to 15%
-- **Google Workspace Integration**: Seamless document creation and management
+- **3-minute workflow** (vs 90+ minutes manual)
+- **80+ quality scoring** with automatic pass/fail gate
+- **88-96% medical accuracy** via RAG validation
+- **Greek localization** with cultural context
+- **Google Workspace integration** for publishing
 
 ## Quick Start
 
-### Local Development
-
-1. **Install Dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Configure Environment**
-   ```bash
-   cp env_template.txt .env
-   # Edit .env with your API keys
-   ```
-
-3. **Run the Server**
-   ```bash
-   python -m src.main
-   ```
+### Local
+```bash
+pip install -r requirements.txt
+# Configure .env with API keys
+python -m src.main
+```
 
 ### Railway Deployment
+1. Create Railway project → Connect GitHub: `ankaravanas/chloros-blog`
+2. Set environment variables (see `RAILWAY.md`)
+3. Railway auto-deploys on push
 
-1. **Connect GitHub Repository**
-   - Create Railway project
-   - Connect to GitHub repository: `ankaravanas/chloros-blog`
-   - Enable auto-deploy on push
-
-2. **Set Environment Variables**
-   - In Railway dashboard → Variables
-   - Add all API keys (see `railway_env_setup.md`)
-   - Railway automatically handles PORT and HOST
-
-3. **Deploy**
-   - Railway auto-deploys from GitHub
-   - Monitor logs for successful startup
-   - Server accessible via Railway's provided URL
-
-## Architecture
-
-### Workflow Phases
-
-1. **Research & Strategy** (30s, parallel execution)
-   - Medical research via Pinecone vector database
-   - Cultural context research via Perplexity API
-   - Pattern validation from Google Sheets
-   - Content strategy generation
-
-2. **Content Generation** (120s)
-   - Complete article generation using OpenRouter/Gemini
-   - Greek language with Γ' ενικό voice
-   - Markdown formatting with proper structure
-
-3. **Quality Evaluation** (20s)
-   - 4-category scoring system (Voice/Structure/Medical/SEO)
-   - Critical violation detection
-   - Word count validation
-
-4. **Publishing** (5s)
-   - Google Doc creation with HTML conversion
-   - Drive folder management
-   - Tracking sheet updates
-
-### Quality Standards
-
-- **Pass Threshold**: 80+ points out of 100
-- **Word Count**: Within -15% to +∞ of target
-- **Medical Accuracy**: RAG-validated against medical corpus
-- **Voice Consistency**: Γ' ενικό (third person) throughout
-- **Structure**: 2-3 sentence paragraphs, clear section flow
+## Workflow
+1. **Research** (30s): Medical + Cultural + Patterns → Strategy
+2. **Generate** (120s): Complete Greek article with quality patterns
+3. **Evaluate** (20s): 4-category scoring (Voice/Structure/Medical/SEO)
+4. **Publish** (5s): Google Doc creation and folder management
 
 ## API Keys Required
-
-- OpenAI (embeddings and strategy)
-- OpenRouter (content generation)
-- Perplexity (cultural context)
-- Pinecone (medical research)
-- Google Cloud (Sheets, Docs, Drive)
+OpenAI, OpenRouter, Perplexity, Pinecone, Google Cloud (OAuth2)
 
 ## Success Metrics
-
-- ✅ 80%+ articles pass quality gate on first generation
-- ✅ <3 minutes total workflow time (vs 90+ minutes manual)
-- ✅ <5 minutes physician review time (vs 30-45 minutes)
-- ✅ 88-96% medical accuracy validation
-
-## License
-
-MIT License - See LICENSE file for details.
+- 80%+ quality pass rate
+- 88-96% medical accuracy  
+- <3 minutes total workflow
+- Reduces editing from 85% to 15%
