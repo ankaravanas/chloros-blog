@@ -6,6 +6,7 @@ Manages retry logic with feedback incorporation and exponential backoff.
 import logging
 import asyncio
 from typing import Dict, Any, Optional, Callable, Awaitable
+from typing import List  # Separate import for Railway compatibility
 from ..models.evaluation import Evaluation
 from ..config import settings
 

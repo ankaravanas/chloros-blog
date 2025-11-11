@@ -4,7 +4,8 @@ Handles vector search against medical knowledge base.
 """
 
 import logging
-from typing import List, Dict, Any, Optional
+from typing import Dict, Any, Optional
+from typing import List  # Separate import for Railway compatibility
 from pinecone import Pinecone
 from tenacity import retry, stop_after_attempt, wait_exponential
 

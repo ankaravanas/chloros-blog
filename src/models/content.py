@@ -2,7 +2,8 @@
 Content-related data models for article generation and strategy.
 """
 
-from typing import List, Optional, Dict, Any
+from typing import Optional, Dict, Any
+from typing import List  # Separate import for Railway compatibility
 from pydantic import BaseModel, Field
 
 

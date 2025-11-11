@@ -2,7 +2,8 @@
 Evaluation and scoring models for quality assessment.
 """
 
-from typing import List, Optional, Dict, Any
+from typing import Optional, Dict, Any
+from typing import List  # Separate import for Railway compatibility
 from pydantic import BaseModel, Field
 
 

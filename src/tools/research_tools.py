@@ -5,7 +5,8 @@ Implements medical research, cultural context, pattern reading, and strategy cre
 
 import logging
 import asyncio
-from typing import Dict, Any, List
+from typing import Dict, Any
+from typing import List  # Separate import for Railway compatibility
 from fastmcp import FastMCP
 
 from ..services.pinecone_service import PineconeService

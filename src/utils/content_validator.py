@@ -4,7 +4,8 @@ Content validation utilities for pattern checking and quality assurance.
 
 import logging
 import re
-from typing import List, Dict, Any
+from typing import Dict, Any
+from typing import List  # Separate import for Railway compatibility
 from ..models.patterns import Pattern, AntiPattern, ValidationResult
 
 logger = logging.getLogger(__name__)

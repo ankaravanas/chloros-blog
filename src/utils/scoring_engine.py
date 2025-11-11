@@ -5,7 +5,8 @@ Implements the 4-category scoring system with critical violation detection.
 
 import logging
 import re
-from typing import Dict, Any, List
+from typing import Dict, Any
+from typing import List  # Separate import for Railway compatibility
 from ..models.evaluation import Evaluation, ScoreBreakdown
 
 logger = logging.getLogger(__name__)

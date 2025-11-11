@@ -5,7 +5,8 @@ Handles queries about Greek healthcare culture and patient perceptions.
 
 import logging
 import httpx
-from typing import Dict, Any, List
+from typing import Dict, Any
+from typing import List  # Separate import for Railway compatibility
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from ..config import settings

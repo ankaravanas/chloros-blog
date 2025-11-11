@@ -4,7 +4,8 @@ Handles reading pattern data, creating documents, and managing files.
 """
 
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
+from typing import List  # Separate import for Railway compatibility
 import json
 from datetime import datetime
 

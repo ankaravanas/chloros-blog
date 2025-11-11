@@ -4,7 +4,8 @@ Handles text embeddings and strategic planning for content creation.
 """
 
 import logging
-from typing import List, Dict, Any
+from typing import Dict, Any
+from typing import List  # Separate import for Railway compatibility
 from openai import AsyncOpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
 
