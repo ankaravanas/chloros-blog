@@ -59,22 +59,25 @@ def main():
         
         # Railway provides PORT environment variable, fallback to settings.port
         port = int(os.getenv('PORT', settings.port))
-        host = settings.host
         
         # Detect Railway environment
         is_railway = bool(os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('RAILWAY_PROJECT_ID'))
         environment = 'Railway' if is_railway else 'Local'
         
         # Start the MCP server
-        logger.info(f"Server starting on {host}:{port}")
+        logger.info(f"Server starting on port {port}")
         logger.info(f"Environment: {environment}")
         
         if is_railway:
             logger.info(f"Railway Project ID: {os.getenv('RAILWAY_PROJECT_ID', 'Unknown')}")
             logger.info(f"Railway Service ID: {os.getenv('RAILWAY_SERVICE_ID', 'Unknown')}")
         
-        # Railway-compatible server startup
-        mcp.run(host=host, port=port)
+        # FastMCP server startup
+        logger.info("Starting MCP server...")
+        
+        # MCP servers run via stdio protocol
+        # Railway will keep the container alive as long as the process runs
+        mcp.run()
         
     except KeyboardInterrupt:
         logger.info("Server shutdown requested")
