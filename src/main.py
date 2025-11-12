@@ -20,8 +20,8 @@ mcp = FastMCP("Chloros Blog MCP Server")
 
 
 @mcp.tool()
-async def medical_research_query(topic: str, keywords: str) -> dict:
-    """Query medical research database for topic."""
+async def search_pinecone_medical(topic: str, keywords: str) -> dict:
+    """Step 3: Search Pinecone medical database for research facts."""
     try:
         from .services.openai_service import OpenAIService
         from .services.pinecone_service import PineconeService
@@ -45,7 +45,7 @@ async def medical_research_query(topic: str, keywords: str) -> dict:
 
 @mcp.tool()
 async def cultural_context_research(topic: str) -> dict:
-    """Research Greek cultural context for medical topic."""
+    """Step 1: Research Greek cultural context for medical topic."""
     try:
         from .services.perplexity_service import PerplexityService
         
@@ -63,13 +63,76 @@ async def cultural_context_research(topic: str) -> dict:
 
 
 @mcp.tool()
-async def generate_article(
+async def read_blog_patterns() -> dict:
+    """Step 2: Read approved patterns and restrictions from Google Sheets."""
+    try:
+        from .services.google_service import GoogleService
+        
+        service = GoogleService()
+        patterns = await service.read_blog_patterns()
+        
+        return {
+            "approved_patterns": patterns.get("approved_patterns", []),
+            "forbidden_patterns": patterns.get("forbidden_patterns", []),
+            "patterns_count": len(patterns.get("approved_patterns", []))
+        }
+    except Exception as e:
+        logger.error(f"Pattern reading error: {e}")
+        return {"error": str(e), "approved_patterns": [], "forbidden_patterns": []}
+
+
+@mcp.tool()
+async def create_content_strategy(
+    topic: str,
+    keywords: str,
+    target_words: int,
+    medical_facts: str,
+    cultural_context: str,
+    patterns: str
+) -> dict:
+    """Step 4: Create content strategy based on research."""
+    try:
+        from .services.openai_service import OpenAIService
+        
+        service = OpenAIService()
+        strategy = await service.create_content_strategy(
+            topic=topic,
+            main_keywords=keywords,
+            secondary_keywords="",
+            target_word_count=target_words,
+            negative_keywords="",
+            medical_facts=medical_facts,
+            cultural_context=cultural_context,
+            approved_structure=[]
+        )
+        
+        return {
+            "h1_title": strategy.h1_title,
+            "sections": [
+                {
+                    "title": s.title,
+                    "points": s.content_points,
+                    "words": s.target_words
+                }
+                for s in strategy.content_sections
+            ],
+            "medical_focus": strategy.medical_focus,
+            "target_words": strategy.target_word_count
+        }
+    except Exception as e:
+        logger.error(f"Strategy creation error: {e}")
+        return {"error": str(e), "h1_title": f"Άρθρο για {topic}"}
+
+
+@mcp.tool()
+async def generate_blog_post(
     topic: str,
     target_words: int,
     medical_facts: str,
-    cultural_context: str
+    cultural_context: str,
+    strategy: str
 ) -> dict:
-    """Generate complete Greek medical article."""
+    """Step 5: Generate complete Greek medical blog post."""
     try:
         from .services.openrouter_service import OpenRouterService
         from .models.content import ContentStrategy, Section, SEOStrategy, ContentRestrictions
@@ -119,7 +182,7 @@ async def generate_article(
 
 @mcp.tool()
 async def evaluate_article(article_content: str, target_words: int) -> dict:
-    """Evaluate article quality."""
+    """Step 6: Evaluate article quality with 4-category scoring system."""
     try:
         from .utils.scoring_engine import ScoringEngine
         
@@ -140,6 +203,36 @@ async def evaluate_article(article_content: str, target_words: int) -> dict:
 
 
 @mcp.tool()
+async def export_to_google_doc(
+    article_markdown: str,
+    title: str,
+    quality_score: int
+) -> dict:
+    """Step 7: Export article to Google Doc in Drive folder."""
+    try:
+        from .services.google_service import GoogleService
+        
+        service = GoogleService()
+        status = "PASS" if quality_score >= 80 else "FAIL"
+        
+        result = await service.create_google_doc(
+            article_markdown=article_markdown,
+            title=title,
+            status=status
+        )
+        
+        return {
+            "doc_id": result["doc_id"],
+            "doc_url": result["doc_url"],
+            "status": status,
+            "quality_score": quality_score
+        }
+    except Exception as e:
+        logger.error(f"Google Doc export error: {e}")
+        return {"error": str(e), "doc_url": ""}
+
+
+@mcp.tool()
 async def create_blog_article(
     topic: str,
     keywords: str,
@@ -150,15 +243,27 @@ async def create_blog_article(
         logger.info(f"Creating blog article for: {topic}")
         
         # Step 1: Research
-        medical_research = await medical_research_query(topic, keywords)
         cultural_research = await cultural_context_research(topic)
+        patterns = await read_blog_patterns()
+        medical_research = await search_pinecone_medical(topic, keywords)
         
-        # Step 2: Generate
-        article = await generate_article(
+        # Step 2: Create strategy
+        strategy = await create_content_strategy(
+            topic=topic,
+            keywords=keywords,
+            target_words=target_words,
+            medical_facts="\n".join(medical_research.get("medical_facts", [])),
+            cultural_context=cultural_research.get("cultural_insights", ""),
+            patterns=str(patterns.get("approved_patterns", []))
+        )
+        
+        # Step 3: Generate
+        article = await generate_blog_post(
             topic=topic,
             target_words=target_words,
             medical_facts="\n".join(medical_research.get("medical_facts", [])),
-            cultural_context=cultural_research.get("cultural_insights", "")
+            cultural_context=cultural_research.get("cultural_insights", ""),
+            strategy=str(strategy)
         )
         
         # Step 3: Evaluate
@@ -167,30 +272,21 @@ async def create_blog_article(
             target_words=target_words
         )
         
-        # Step 4: Create Google Doc if quality passes
+        # Step 4: Export to Google Doc
+        doc_result = await export_to_google_doc(
+            article_markdown=article.get("article_markdown", ""),
+            title=topic,
+            quality_score=evaluation.get("total_score", 0)
+        )
+        
         result = {
             "topic": topic,
             "article": article,
             "evaluation": evaluation,
-            "workflow_completed": True
+            "google_doc": doc_result,
+            "workflow_completed": True,
+            "status": doc_result.get("status", "UNKNOWN")
         }
-        
-        if evaluation.get("passes_quality", False):
-            try:
-                from .services.google_service import GoogleService
-                google_service = GoogleService()
-                doc_result = await google_service.create_google_doc(
-                    article_markdown=article.get("article_markdown", ""),
-                    title=topic,
-                    status="PASS"
-                )
-                result["google_doc"] = doc_result
-                result["status"] = "PUBLISHED"
-            except Exception as e:
-                logger.warning(f"Google Doc creation failed: {e}")
-                result["status"] = "ARTICLE_READY"
-        else:
-            result["status"] = "NEEDS_IMPROVEMENT"
         
         logger.info(f"Blog article workflow completed: {result['status']}")
         return result
