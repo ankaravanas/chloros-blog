@@ -760,12 +760,13 @@ def main():
 
 
 def run_railway_server(port: int):
-    """Run HTTP server for Railway with MCP endpoint."""
+    """Run Railway server with proper MCP SSE endpoint."""
     import uvicorn
-    from fastapi import FastAPI, Request
-    from fastapi.responses import JSONResponse, PlainTextResponse
+    from fastapi import FastAPI
+    from fastapi.responses import JSONResponse
     from fastapi.middleware.cors import CORSMiddleware
     
+    # Create main FastAPI app
     app = FastAPI(
         title="Chloros Blog MCP Server",
         description="MCP server for automated orthopedic blog creation"
@@ -798,7 +799,11 @@ def run_railway_server(port: int):
                 "mcp": "/mcp",
                 "tools": "/tools"
             },
-            "usage": "Connect via MCP protocol using the /mcp endpoint"
+            "mcp_connection": {
+                "protocol": "Server-Sent Events (SSE)",
+                "endpoint": "/mcp",
+                "usage": "Connect Claude Desktop to this MCP server"
+            }
         })
     
     @app.get("/health")
@@ -835,37 +840,9 @@ def run_railway_server(port: int):
             }
         })
     
-    @app.post("/mcp")
-    async def mcp_endpoint(request: Request):
-        """MCP protocol endpoint for Railway."""
-        try:
-            # Get request body
-            body = await request.body()
-            
-            # For now, return MCP server info
-            # In a full implementation, this would handle MCP protocol messages
-            return JSONResponse(content={
-                "jsonrpc": "2.0",
-                "result": {
-                    "protocolVersion": "2024-11-05",
-                    "serverInfo": {
-                        "name": "Chloros Blog MCP Server",
-                        "version": "1.0.0"
-                    },
-                    "capabilities": {
-                        "tools": {
-                            "listChanged": True
-                        }
-                    }
-                }
-            })
-            
-        except Exception as e:
-            logger.error(f"MCP endpoint error: {e}")
-            return JSONResponse(
-                status_code=500,
-                content={"error": str(e)}
-            )
+    # Mount the MCP HTTP app at /mcp endpoint
+    mcp_app = mcp.http_app()
+    app.mount("/mcp", mcp_app)
     
     # Run the server
     uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
