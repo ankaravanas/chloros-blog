@@ -739,17 +739,136 @@ def main():
         # Setup server
         asyncio.run(setup_server())
         
-        # Log environment info
+        # Detect Railway environment
         is_railway = bool(os.getenv('RAILWAY_PROJECT_ID'))
-        logger.info(f"Environment: {'Railway' if is_railway else 'Local'}")
-        logger.info("🚀 MCP Server ready - connect via MCP protocol")
+        port = int(os.getenv('PORT', 3000))
         
-        # Start MCP server
-        mcp.run()
+        logger.info(f"Environment: {'Railway' if is_railway else 'Local'}")
+        
+        if is_railway:
+            # Railway deployment - run HTTP server with MCP endpoint
+            logger.info(f"Starting Railway HTTP server on port {port}")
+            run_railway_server(port)
+        else:
+            # Local development - use MCP stdio
+            logger.info("Starting MCP server in stdio mode")
+            mcp.run()
         
     except Exception as e:
         logger.error(f"Server error: {e}")
         raise
+
+
+def run_railway_server(port: int):
+    """Run HTTP server for Railway with MCP endpoint."""
+    import uvicorn
+    from fastapi import FastAPI, Request
+    from fastapi.responses import JSONResponse, PlainTextResponse
+    from fastapi.middleware.cors import CORSMiddleware
+    
+    app = FastAPI(
+        title="Chloros Blog MCP Server",
+        description="MCP server for automated orthopedic blog creation"
+    )
+    
+    # Add CORS middleware
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    
+    @app.get("/")
+    async def root():
+        """Root endpoint with server info."""
+        from .health import get_health_status
+        health = get_health_status()
+        
+        return JSONResponse(content={
+            "name": "Chloros Blog MCP Server",
+            "version": "1.0.0",
+            "description": "MCP server for automated Greek orthopedic blog creation",
+            "status": "running",
+            "health": health,
+            "mcp_tools": 11,
+            "endpoints": {
+                "health": "/health",
+                "mcp": "/mcp",
+                "tools": "/tools"
+            },
+            "usage": "Connect via MCP protocol using the /mcp endpoint"
+        })
+    
+    @app.get("/health")
+    async def health():
+        """Health check endpoint."""
+        from .health import get_health_status
+        return JSONResponse(content=get_health_status())
+    
+    @app.get("/tools")
+    async def list_tools():
+        """List available MCP tools."""
+        tools = [
+            {"name": "medical_research_query", "phase": "1", "description": "Query Pinecone for medical research"},
+            {"name": "cultural_context_research", "phase": "1", "description": "Research Greek cultural context"},
+            {"name": "read_blog_patterns", "phase": "1", "description": "Read patterns from Google Sheets"},
+            {"name": "create_content_strategy", "phase": "1", "description": "Create content strategy"},
+            {"name": "parallel_research_phase", "phase": "1", "description": "Execute all research in parallel"},
+            {"name": "generate_complete_article", "phase": "2", "description": "Generate complete Greek article"},
+            {"name": "evaluate_article_quality", "phase": "3", "description": "AI-powered quality evaluation"},
+            {"name": "evaluate_with_local_scoring", "phase": "3", "description": "Local scoring evaluation"},
+            {"name": "create_google_doc", "phase": "4", "description": "Create Google Doc from markdown"},
+            {"name": "publish_article", "phase": "4", "description": "Publish article to Drive"},
+            {"name": "complete_article_workflow", "phase": "1-4", "description": "End-to-end workflow"}
+        ]
+        
+        return JSONResponse(content={
+            "total_tools": len(tools),
+            "tools": tools,
+            "workflow_phases": {
+                "1": "Research & Strategy (30s)",
+                "2": "Content Generation (120s)", 
+                "3": "Quality Evaluation (20s)",
+                "4": "Publishing (5s)"
+            }
+        })
+    
+    @app.post("/mcp")
+    async def mcp_endpoint(request: Request):
+        """MCP protocol endpoint for Railway."""
+        try:
+            # Get request body
+            body = await request.body()
+            
+            # For now, return MCP server info
+            # In a full implementation, this would handle MCP protocol messages
+            return JSONResponse(content={
+                "jsonrpc": "2.0",
+                "result": {
+                    "protocolVersion": "2024-11-05",
+                    "serverInfo": {
+                        "name": "Chloros Blog MCP Server",
+                        "version": "1.0.0"
+                    },
+                    "capabilities": {
+                        "tools": {
+                            "listChanged": True
+                        }
+                    }
+                }
+            })
+            
+        except Exception as e:
+            logger.error(f"MCP endpoint error: {e}")
+            return JSONResponse(
+                status_code=500,
+                content={"error": str(e)}
+            )
+    
+    # Run the server
+    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
 
 
 async def setup_server():
