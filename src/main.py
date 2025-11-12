@@ -244,68 +244,7 @@ async def export_to_google_doc(
         return {"error": str(e), "doc_url": ""}
 
 
-@mcp.tool()
-async def create_blog_article(
-    topic: str,
-    keywords: str,
-    target_words: int = 2000
-) -> dict:
-    """Complete blog article creation workflow."""
-    try:
-        logger.info(f"Creating blog article for: {topic}")
-        
-        # Step 1: Research
-        cultural_research = await cultural_context_research(topic)
-        patterns = await read_blog_patterns()
-        medical_research = await search_pinecone_medical(topic, keywords)
-        
-        # Step 2: Create strategy
-        strategy = await create_content_strategy(
-            topic=topic,
-            keywords=keywords,
-            target_words=target_words,
-            medical_facts="\n".join(medical_research.get("medical_facts", [])),
-            cultural_context=cultural_research.get("cultural_insights", ""),
-            patterns=str(patterns.get("approved_patterns", []))
-        )
-        
-        # Step 3: Generate
-        article = await generate_blog_post(
-            topic=topic,
-            target_words=target_words,
-            medical_facts="\n".join(medical_research.get("medical_facts", [])),
-            cultural_context=cultural_research.get("cultural_insights", ""),
-            strategy=str(strategy)
-        )
-        
-        # Step 3: Evaluate
-        evaluation = await evaluate_article(
-            article_content=article.get("article_markdown", ""),
-            target_words=target_words
-        )
-        
-        # Step 4: Export to Google Doc
-        doc_result = await export_to_google_doc(
-            article_markdown=article.get("article_markdown", ""),
-            title=topic,
-            quality_score=evaluation.get("total_score", 0)
-        )
-        
-        result = {
-            "topic": topic,
-            "article": article,
-            "evaluation": evaluation,
-            "google_doc": doc_result,
-            "workflow_completed": True,
-            "status": doc_result.get("status", "UNKNOWN")
-        }
-        
-        logger.info(f"Blog article workflow completed: {result['status']}")
-        return result
-        
-    except Exception as e:
-        logger.error(f"Blog creation workflow error: {e}")
-        return {"error": str(e), "status": "FAILED"}
+# Complete workflow tool removed - use individual steps instead
 
 
 def main():

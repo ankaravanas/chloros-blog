@@ -15,8 +15,8 @@ Connect this MCP server to Claude Desktop to automate medical blog creation thro
 6. **`evaluate_article`** - Score quality with 4-category system (Voice/Structure/Medical/SEO)
 7. **`export_to_google_doc`** - Export to Google Drive folder
 
-### Complete Workflow Tool
-- **`create_blog_article`** - Runs all 7 steps automatically for full automation
+### Sequential Execution Only
+Run each step individually for complete control over the blog creation process.
 
 ## MCP Connection
 
@@ -44,8 +44,7 @@ python -m src.main
 6. `evaluate_article(article_content, 2000)`
 7. `export_to_google_doc(article_markdown, title, quality_score)`
 
-**Full Automation**:
-`create_blog_article("ACL reconstruction", "knee surgery recovery", 2000)`
+**Execute each step in sequence for complete control and customization.**
 
 ## Quality System
 - **Pass threshold**: 80+ points
