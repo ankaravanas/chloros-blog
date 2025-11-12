@@ -2,7 +2,6 @@
 
 from .content import ContentStrategy, Article, Section, SEOStrategy, ContentRestrictions
 from .evaluation import Evaluation, ScoreBreakdown
-from .patterns import Pattern, AntiPattern, Structure, ScoringMatrix, Fix
 
 __all__ = [
     "ContentStrategy",
@@ -11,10 +10,5 @@ __all__ = [
     "SEOStrategy",
     "ContentRestrictions",
     "Evaluation",
-    "ScoreBreakdown", 
-    "Pattern",
-    "AntiPattern",
-    "Structure",
-    "ScoringMatrix",
-    "Fix"
+    "ScoreBreakdown"
 ]

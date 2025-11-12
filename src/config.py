@@ -1,18 +1,13 @@
 """
-Configuration management for the Chloros Blog MCP Server.
-Handles environment variables and application settings.
+Configuration for Chloros Blog MCP Server.
 """
 
 import os
-from typing import Optional
-from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    """Application settings loaded from environment variables."""
-    
-    model_config = SettingsConfigDict(env_file=".env", case_sensitive=False)
+    """Application settings from environment variables."""
     
     # API Keys
     openai_api_key: str
@@ -31,7 +26,6 @@ class Settings(BaseSettings):
     
     # Server Configuration
     port: int = 3000
-    host: str = "0.0.0.0"
     log_level: str = "INFO"
     
     # Model Configuration
@@ -43,6 +37,9 @@ class Settings(BaseSettings):
     quality_pass_threshold: int = 80
     word_count_fail_threshold: float = -0.15
     max_retries: int = 3
+    
+    class Config:
+        env_file = ".env"
 
 
 # Global settings instance
