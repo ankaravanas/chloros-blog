@@ -21,26 +21,45 @@ mcp = FastMCP("Chloros Blog MCP Server")
 
 @mcp.tool()
 async def search_pinecone_medical(topic: str, keywords: str) -> dict:
-    """Step 3: Search Pinecone medical database for research facts."""
+    """Step 3: Search Pinecone medical database for clinical information about treatment procedures, success rates, patient safety, recovery timelines, and contraindications."""
     try:
         from .services.openai_service import OpenAIService
         from .services.pinecone_service import PineconeService
         
+        logger.info(f"Searching medical database for: {topic}")
+        
         openai_service = OpenAIService()
         pinecone_service = PineconeService()
         
-        # Create embedding and search
-        embedding = await openai_service.create_embeddings(f"{topic} {keywords}")
-        results = await pinecone_service.search_medical_knowledge(embedding, top_k=10)
+        # Create embedding for medical query (matching N8n approach)
+        query = f"Find clinical information about {topic}: treatment procedures, success rates and outcomes, patient safety, recovery timelines, medical contraindications {keywords}"
+        embedding = await openai_service.create_embeddings(query)
+        
+        # Search with topK=25 as in your N8n setup
+        results = await pinecone_service.search_medical_knowledge(embedding, top_k=25)
+        
+        # Extract medical facts for patient education
+        medical_facts = []
+        for result in results[:10]:  # Top 10 most relevant
+            content = result.get('content', '')
+            if content:
+                medical_facts.append(content)
         
         return {
             "topic": topic,
+            "query_used": query,
             "results_count": len(results),
-            "medical_facts": [r.get('content', '') for r in results[:5]]
+            "medical_facts": medical_facts,
+            "status": "success"
         }
     except Exception as e:
         logger.error(f"Medical research error: {e}")
-        return {"error": str(e), "medical_facts": []}
+        return {
+            "topic": topic,
+            "error": str(e),
+            "medical_facts": [f"Error accessing medical database for {topic}: {str(e)}"],
+            "status": "error"
+        }
 
 
 @mcp.tool()
@@ -49,17 +68,26 @@ async def cultural_context_research(topic: str) -> dict:
     try:
         from .services.perplexity_service import PerplexityService
         
+        logger.info(f"Researching Greek cultural context for: {topic}")
+        
         service = PerplexityService()
         result = await service.research_cultural_context(topic)
         
         return {
             "topic": topic,
             "cultural_insights": result.get("cultural_insights", ""),
-            "patient_concerns": result.get("patient_concerns", [])
+            "patient_concerns": result.get("patient_concerns", []),
+            "status": "success"
         }
     except Exception as e:
         logger.error(f"Cultural research error: {e}")
-        return {"error": str(e), "cultural_insights": ""}
+        return {
+            "topic": topic,
+            "error": str(e),
+            "cultural_insights": f"Error researching cultural context for {topic}: {str(e)}",
+            "patient_concerns": [],
+            "status": "error"
+        }
 
 
 @mcp.tool()
@@ -77,9 +105,14 @@ async def read_blog_patterns() -> dict:
             "approved_structure": patterns.get("approved_structure", []),
             "scoring_matrix": patterns.get("scoring_matrix", []),
             "specific_fixes": patterns.get("specific_fixes", []),
-            "total_patterns": len(patterns.get("approved_patterns", [])),
-            "total_structures": len(patterns.get("approved_structure", [])),
-            "scoring_criteria": len(patterns.get("scoring_matrix", []))
+            "summary": {
+                "patterns_count": len(patterns.get("approved_patterns", [])),
+                "forbidden_count": len(patterns.get("forbidden_patterns", [])),
+                "structures_count": len(patterns.get("approved_structure", [])),
+                "scoring_criteria": len(patterns.get("scoring_matrix", [])),
+                "fixes_available": len(patterns.get("specific_fixes", []))
+            },
+            "status": "success"
         }
     except Exception as e:
         logger.error(f"Pattern reading error: {e}")
@@ -89,7 +122,8 @@ async def read_blog_patterns() -> dict:
             "forbidden_patterns": [],
             "approved_structure": [],
             "scoring_matrix": [],
-            "specific_fixes": []
+            "specific_fixes": [],
+            "status": "error"
         }
 
 
@@ -129,11 +163,19 @@ async def create_content_strategy(
                 for s in strategy.content_sections
             ],
             "medical_focus": strategy.medical_focus,
-            "target_words": strategy.target_word_count
+            "target_words": strategy.target_word_count,
+            "status": "success"
         }
     except Exception as e:
         logger.error(f"Strategy creation error: {e}")
-        return {"error": str(e), "h1_title": f"Άρθρο για {topic}"}
+        return {
+            "error": str(e), 
+            "h1_title": f"Άρθρο για {topic}",
+            "sections": [],
+            "medical_focus": [topic],
+            "target_words": target_words,
+            "status": "error"
+        }
 
 
 @mcp.tool()
@@ -184,12 +226,19 @@ async def generate_blog_post(
             "topic": topic,
             "article_markdown": article.article_markdown,
             "word_count": article.word_count,
-            "h1_title": article.h1_title
+            "h1_title": article.h1_title,
+            "status": "success"
         }
         
     except Exception as e:
         logger.error(f"Article generation error: {e}")
-        return {"error": str(e), "article_markdown": f"# {topic}\n\nΣφάλμα στη δημιουργία άρθρου."}
+        return {
+            "error": str(e), 
+            "article_markdown": f"# {topic}\n\nΣφάλμα στη δημιουργία άρθρου.",
+            "word_count": 0,
+            "h1_title": f"Άρθρο για {topic}",
+            "status": "error"
+        }
 
 
 @mcp.tool()
@@ -206,12 +255,21 @@ async def evaluate_article(article_content: str, target_words: int) -> dict:
             "word_count": evaluation.word_count_actual,
             "passes_quality": evaluation.passes_quality_gate,
             "critical_issues": evaluation.critical_issues,
-            "improvements": evaluation.improvements_needed
+            "improvements": evaluation.improvements_needed,
+            "status": "success"
         }
         
     except Exception as e:
         logger.error(f"Evaluation error: {e}")
-        return {"error": str(e), "total_score": 0}
+        return {
+            "error": str(e), 
+            "total_score": 0,
+            "word_count": 0,
+            "passes_quality": False,
+            "critical_issues": [str(e)],
+            "improvements": ["Fix evaluation error"],
+            "status": "error"
+        }
 
 
 @mcp.tool()
@@ -236,12 +294,20 @@ async def export_to_google_doc(
         return {
             "doc_id": result["doc_id"],
             "doc_url": result["doc_url"],
-            "status": status,
-            "quality_score": quality_score
+            "export_status": status,
+            "quality_score": quality_score,
+            "status": "success"
         }
     except Exception as e:
         logger.error(f"Google Doc export error: {e}")
-        return {"error": str(e), "doc_url": ""}
+        return {
+            "error": str(e), 
+            "doc_url": "",
+            "doc_id": "",
+            "export_status": "FAILED",
+            "quality_score": quality_score,
+            "status": "error"
+        }
 
 
 # Complete workflow tool removed - use individual steps instead
