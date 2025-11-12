@@ -64,7 +64,7 @@ async def cultural_context_research(topic: str) -> dict:
 
 @mcp.tool()
 async def read_blog_patterns() -> dict:
-    """Step 2: Read approved patterns and restrictions from Google Sheets."""
+    """Step 2: Read all patterns, structure, scoring matrix, and fixes from Google Sheets."""
     try:
         from .services.google_service import GoogleService
         
@@ -74,11 +74,23 @@ async def read_blog_patterns() -> dict:
         return {
             "approved_patterns": patterns.get("approved_patterns", []),
             "forbidden_patterns": patterns.get("forbidden_patterns", []),
-            "patterns_count": len(patterns.get("approved_patterns", []))
+            "approved_structure": patterns.get("approved_structure", []),
+            "scoring_matrix": patterns.get("scoring_matrix", []),
+            "specific_fixes": patterns.get("specific_fixes", []),
+            "total_patterns": len(patterns.get("approved_patterns", [])),
+            "total_structures": len(patterns.get("approved_structure", [])),
+            "scoring_criteria": len(patterns.get("scoring_matrix", []))
         }
     except Exception as e:
         logger.error(f"Pattern reading error: {e}")
-        return {"error": str(e), "approved_patterns": [], "forbidden_patterns": []}
+        return {
+            "error": str(e), 
+            "approved_patterns": [], 
+            "forbidden_patterns": [],
+            "approved_structure": [],
+            "scoring_matrix": [],
+            "specific_fixes": []
+        }
 
 
 @mcp.tool()

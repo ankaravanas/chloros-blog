@@ -45,19 +45,30 @@ class GoogleService:
             raise
     
     async def read_blog_patterns(self) -> Dict[str, Any]:
-        """Read pattern data from Google Sheets."""
+        """Read all pattern data from Google Sheets."""
         try:
-            # Read basic pattern data
-            ranges = ['APPROVED_PATTERNS!A:F', 'FORBIDDEN_PATTERNS!A:G']
+            # Read all 5 sheet tabs as specified in original requirements
+            ranges = [
+                'APPROVED_PATTERNS!A:F',
+                'FORBIDDEN_PATTERNS!A:G', 
+                'APPROVED_STRUCTURE!A:H',
+                'SCORING_MATRIX!A:D',
+                'SPECIFIC_FIXES!A:F'
+            ]
             
             result = self.sheets_service.spreadsheets().values().batchGet(
                 spreadsheetId=settings.google_sheets_id,
                 ranges=ranges
             ).execute()
             
+            value_ranges = result.get('valueRanges', [])
+            
             return {
-                'approved_patterns': result.get('valueRanges', [{}])[0].get('values', []),
-                'forbidden_patterns': result.get('valueRanges', [{}])[1].get('values', []) if len(result.get('valueRanges', [])) > 1 else []
+                'approved_patterns': value_ranges[0].get('values', []) if len(value_ranges) > 0 else [],
+                'forbidden_patterns': value_ranges[1].get('values', []) if len(value_ranges) > 1 else [],
+                'approved_structure': value_ranges[2].get('values', []) if len(value_ranges) > 2 else [],
+                'scoring_matrix': value_ranges[3].get('values', []) if len(value_ranges) > 3 else [],
+                'specific_fixes': value_ranges[4].get('values', []) if len(value_ranges) > 4 else []
             }
             
         except Exception as e:
